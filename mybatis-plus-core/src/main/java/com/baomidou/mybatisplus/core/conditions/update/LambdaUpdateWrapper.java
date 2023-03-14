@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.util.ArrayList;
@@ -78,7 +79,9 @@ public class LambdaUpdateWrapper<T> extends AbstractLambdaWrapper<T, LambdaUpdat
     @Override
     public LambdaUpdateWrapper<T> set(boolean condition, SFunction<T, ?> column, Object val, String mapping) {
         return maybeDo(condition, () -> {
-            String sql = formatParam(mapping, val);
+            ColumnCache columnCache = getColumnCache(column);
+            String usedMapping = mapping == null ? columnCache.getMapping() : mapping;
+            String sql = formatParam(usedMapping, val);
             sqlSet.add(columnToString(column) + Constants.EQUALS + sql);
         });
     }
